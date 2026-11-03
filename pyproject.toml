@@ -1,0 +1,10 @@
+[project]
+name = "interview-task-data-engineer"
+version = "0.1.0"
+description = "Optional starter for a weather ETL interview exercise."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "httpx>=0.28.1",
+    "polars>=2.0.0",
+]
