@@ -22,7 +22,6 @@ def main() -> None:
     """Implement the pipeline and demonstrate the SQL queries."""
     # Choose your own functions, classes, modules, and input-selection approach.
     create_database()
-    print("\nWindiest hours per city:")
     for city in CITIES:
         city_id = insert_city(city, CITIES[city][0], CITIES[city][1])
 
@@ -54,16 +53,18 @@ def main() -> None:
             insert_hourly_weather(city_id, response["hourly"]["time"][i], response["hourly"]["temperature_2m"][i], response["hourly"]["wind_speed_10m"][i],rolling_mean_c)
 
         timestamps = response["hourly"]["time"]
+        avg_temps = avg_temp_per_city(
+            city_id, min(timestamps), max(timestamps)
+        )
+        for city_name, avg_temp in avg_temps:
+            print(f"\nAverage temperature for {city_name}: {avg_temp:.2f} °C")
+
         windiest_hours = windiest_hours_per_city(
             city_id, min(timestamps), max(timestamps)
         )
+        print(f"Windiest hours for {city}:")
         for city_name, timestamp_utc, wind_speed in windiest_hours:
             print(f"{city_name}: {timestamp_utc} with wind speed {wind_speed:.2f} m/s")
-
-    avg_temps = avg_temp_per_city()
-    print("Average temperatures per city:")
-    for city_name, avg_temp in avg_temps:
-        print(f"{city_name}: {avg_temp:.2f} °C")
 
         
 def api_route(disable: bool = False) -> str:
@@ -160,8 +161,8 @@ def insert_hourly_weather(city_id: int, timestamp_utc: str, temperature_c: float
     finally:
         conn.close()
 
-def avg_temp_per_city() -> list[tuple[str, float]]:
-    """Return the average temperature per city."""
+def avg_temp_per_city(city_id: int, start_utc: str, end_utc: str) -> list[tuple[str, float]]:
+    """Return a city's average temperature over its input window."""
     conn = sqlite3.connect(DATABASE_PATH)
 
     try:
@@ -171,8 +172,11 @@ def avg_temp_per_city() -> list[tuple[str, float]]:
             SELECT c.name, AVG(hw.temperature_c) AS avg_temp
             FROM cities c
             JOIN hourly_weather hw ON c.city_id = hw.city_id
+            WHERE hw.city_id = ?
+              AND hw.timestamp_utc BETWEEN ? AND ?
             GROUP BY c.name
-            """
+            """,
+            (city_id, start_utc, end_utc),
         )
         results = cursor.fetchall()
         return results
