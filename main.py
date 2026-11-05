@@ -33,6 +33,9 @@ def main() -> None:
             response = sample_data[city]
         else:
             response = httpx.get(API_URL + f"?latitude={CITIES[city][0]}&longitude={CITIES[city][1]}"+f"&hourly=temperature_2m,wind_speed_10m&temperature_unit=celsius&wind_speed_unit=ms&timezone=GMT&forecast_hours=48")
+            if response.status_code != 200:
+                print(f"Failed to fetch data for {city}. Status code: {response.status_code}")
+                continue
             response = response.json()
 
 
