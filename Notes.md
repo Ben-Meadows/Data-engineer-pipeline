@@ -147,5 +147,7 @@ Approximately 4 hours.
 
 ## Assistance used
 
-I used Chat GPT to list requirements in an easier format
+- I used Chat GPT to list functional requirements into an easier format
+- Used https://www.python-httpx.org/ for docs on httpx
+- I used SQLBolt for help learning SQL queries: https://sqlbolt.com/
 
