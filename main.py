@@ -25,7 +25,7 @@ def main() -> None:
     for city in CITIES:
         city_id = insert_city(city, CITIES[city][0], CITIES[city][1])
 
-        flag = API_URL == api_route(disable=True)
+        flag = API_URL == api_route(disable=False)
         if not flag:
             print(f"API route is disabled. Using local file: {SAMPLE_PATH}")
             with open(SAMPLE_PATH, "r") as f:
